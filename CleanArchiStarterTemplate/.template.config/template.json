@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json.schemastore.org/template",
+  "author": "Francois Chanteau",
+  "classifications": ["Web", "API", "Clean Architecture", "Starter"],
+  "identity": "Fcu.StarterTemplateCleanArchitecture",
+  "name": "Starter Template Clean Architecture",
+  "shortName": "cleanarch",
+  "tags": {
+    "language": "C#",
+    "type": "project"
+  },
+  "sourceName": "Starter",
+  "preferNameDirectory": true
+}
