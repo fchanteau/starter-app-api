@@ -37,14 +37,23 @@ jobs:
         working-directory: ./CleanArchiStarterTemplate
         run: dotnet build --configuration Release --no-restore
 
-    outputs:
-      build_artifact_path: ${{ steps.build.outputs.build_artifact_path }}
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-output
+          path: ./CleanArchiStarterTemplate/**/bin/Release/net8.0/
 
   test:
     runs-on: ubuntu-latest
     needs: build
     steps:
       - uses: actions/checkout@v4
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-output
+          path: ./CleanArchiStarterTemplate/
 
       - name: Setup .NET Core
         uses: actions/setup-dotnet@v4
