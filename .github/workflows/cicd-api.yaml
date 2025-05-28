@@ -84,7 +84,7 @@ jobs:
 
       - name: Set short SHA
         id: vars
-        run: echo "SHORT_SHA=${GITHUB_SHA::8}" >> $GITHUB_ENV
+        run: echo "SHORT_SHA=${GITHUB_SHA::7}" >> $GITHUB_ENV
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
@@ -99,5 +99,5 @@ jobs:
           file: ./CleanArchiStarterTemplate/Dockerfile
           push: true
           tags: |
-            ${{ secrets.DOCKER_USERNAME }}/starter-app:latest
+            ${{ secrets.DOCKER_USERNAME }}/starter-app${{ github.ref_name == 'main' && ':latest' || '' }}
             ${{ secrets.DOCKER_USERNAME }}/starter-app:${{ github.ref_name }}.${{ env.SHORT_SHA }}
