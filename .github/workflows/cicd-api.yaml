@@ -93,7 +93,7 @@ jobs:
           if [ "${GITHUB_REF_NAME}" = "main" ]; then
             TAGS="$TAGS,${{ secrets.DOCKER_USERNAME }}/starter-app:latest"
           fi
-          echo "tags=$TAGS" >> $GITHUB_OUTPUT
+          echo "tags=$TAGS" >> $GITHUB_ENV
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
@@ -107,4 +107,4 @@ jobs:
           context: ./CleanArchiStarterTemplate
           file: ./CleanArchiStarterTemplate/Dockerfile
           push: true
-          tags: ${{ steps.docker_tags.outputs.tags }}
+          tags: ${{ env.tags }}
