@@ -94,4 +94,6 @@ jobs:
           context: ./CleanArchiStarterTemplate
           file: ./CleanArchiStarterTemplate/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/starter-app:latest
+          tags: |
+            ${{ secrets.DOCKER_USERNAME }}/starter-app:latest
+            ${{ secrets.DOCKER_USERNAME }}/starter-app:${{ github.ref_name }}.${{ github.sha::8 }}
