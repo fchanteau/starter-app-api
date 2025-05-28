@@ -1,33 +1,77 @@
 name: Build and Test API / Build Docker image and push to Docker Hub
+
 on:
   workflow_dispatch:
   push:
     branches:
       - main
     paths:
-      - "CleanArchiStarterTemplate/**" ## Change this or remove it, needed because of the template
+      - "CleanArchiStarterTemplate/**"
 
 jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup .ET Core
+      - name: Setup .NET Core
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "8.0.x"
 
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj') }}
+          restore-keys: |
+            nuget-${{ runner.os }}-
+
+      - name: Restore dependencies
+        working-directory: ./CleanArchiStarterTemplate
+        run: dotnet restore
+
       - name: Build with dotnet
         working-directory: ./CleanArchiStarterTemplate
-        run: dotnet build --configuration Release
+        run: dotnet build --configuration Release --no-restore
 
-      - name: Run tests with dotnet
+    outputs:
+      build_artifact_path: ${{ steps.build.outputs.build_artifact_path }}
+
+  test:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj') }}
+          restore-keys: |
+            nuget-${{ runner.os }}-
+
+      - name: Restore dependencies
+        working-directory: ./CleanArchiStarterTemplate
+        run: dotnet restore
+
+      - name: Test with dotnet
         working-directory: ./CleanArchiStarterTemplate
         run: dotnet test --configuration Release --no-build --verbosity normal
+
+  docker:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
