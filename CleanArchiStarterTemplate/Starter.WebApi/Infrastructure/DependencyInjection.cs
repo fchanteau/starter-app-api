@@ -1,9 +1,6 @@
-﻿using Microsoft.AspNetCore.Diagnostics.HealthChecks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
+﻿using Microsoft.AspNetCore.Mvc;
 using Starter.Infrastructure.Database;
-using System.Text;
-using System.Text.Json;
+using Starter.WebApi.Infrastructure.Otel;
 using System.Text.Json.Serialization;
 
 namespace Starter.WebApi.Infrastructure;
@@ -39,13 +36,12 @@ public static class DependencyInjection
 
         // project specific services
         // example : builder.AddProjectAuthentication();
+        builder.AddOtel();
+        builder.AddLogging();
     }
 
     public static void UseWebInfrastructure(this WebApplication app)
     {
-        // project specific middleware
-        // example : app.UseProjectCors();
-
         // Common MVC configuration
         app.UseHttpsRedirection();
         app.UseAuthorization();
@@ -53,52 +49,5 @@ public static class DependencyInjection
 
         app.UseOpenApi();
         app.UseSwaggerUi();
-
-        app.MapHealthChecks("/healthz", new HealthCheckOptions
-        {
-            ResponseWriter = WriteResponse
-        });
-    }
-
-    private static Task WriteResponse(HttpContext context, HealthReport healthReport)
-    {
-        context.Response.ContentType = "application/json; charset=utf-8";
-
-        var options = new JsonWriterOptions { Indented = true };
-
-        using var memoryStream = new MemoryStream();
-        using(var jsonWriter = new Utf8JsonWriter(memoryStream, options))
-        {
-            jsonWriter.WriteStartObject();
-            jsonWriter.WriteString("status", healthReport.Status.ToString());
-            jsonWriter.WriteStartObject("results");
-
-            foreach(var healthReportEntry in healthReport.Entries)
-            {
-                jsonWriter.WriteStartObject(healthReportEntry.Key);
-                jsonWriter.WriteString("status",
-                    healthReportEntry.Value.Status.ToString());
-                jsonWriter.WriteString("description",
-                    healthReportEntry.Value.Description);
-                jsonWriter.WriteStartObject("data");
-
-                foreach(var item in healthReportEntry.Value.Data)
-                {
-                    jsonWriter.WritePropertyName(item.Key);
-
-                    JsonSerializer.Serialize(jsonWriter, item.Value,
-                        item.Value?.GetType() ?? typeof(object));
-                }
-
-                jsonWriter.WriteEndObject();
-                jsonWriter.WriteEndObject();
-            }
-
-            jsonWriter.WriteEndObject();
-            jsonWriter.WriteEndObject();
-        }
-
-        return context.Response.WriteAsync(
-            Encoding.UTF8.GetString(memoryStream.ToArray()));
     }
 }
