@@ -3,7 +3,7 @@
 ## 🛠️ Installer le template
 
 ```bash
-git clone https://github.com/mon-org/MyStarterTemplate.git #(TODO CHANGE TO REAL REPO)
+git clone https://github.com/fchanteau/starter-app-api.git
 dotnet new install .\CleanArchiStarterTemplate\
 ```
 
@@ -34,3 +34,9 @@ dotnet new cleanarch -n MonAppli
 - xUnit
 - [NSubstitute](https://nsubstitute.github.io/)
 - [FluentAssertions](https://fluentassertions.com/)
+
+### 🔍 Logs
+
+- Serilog
+- OpenTelemetry
+- Grafana
