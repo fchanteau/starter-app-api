@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Starter.WebApi.Controllers;
 [Route("api/test")]
 [ApiController]
-public class TestController : ApiController
+public class TestController(IConfiguration configuration) : ApiController
 {
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]
     [HttpGet]
@@ -14,5 +14,11 @@ public class TestController : ApiController
             _ => Ok("Success"),
             Problem
         );
+    }
+
+    [HttpGet("config")]
+    public IActionResult GetConfigValue()
+    {
+        return Ok(configuration["ConfigSection:Value"]);
     }
 }
