@@ -16,9 +16,17 @@ public class TestController(IConfiguration configuration) : ApiController
         );
     }
 
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]
     [HttpGet("config")]
     public IActionResult GetConfigValue()
     {
-        return Ok(configuration["ConfigSection:Value"]);
+        var configValue = configuration["ConfigSection:Value"];
+
+        if(string.IsNullOrEmpty(configValue))
+        {
+            return BadRequest("No config found");
+
+        }
+        return Ok(configValue);
     }
 }
