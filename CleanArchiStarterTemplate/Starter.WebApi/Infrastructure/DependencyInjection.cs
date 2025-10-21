@@ -1,7 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Starter.Infrastructure.Database;
-using Starter.WebApi.Infrastructure.Otel;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Mvc;
+using Starter.WebApi.Infrastructure.Logging;
+using Starter.WebApi.Infrastructure.Otel;
 
 namespace Starter.WebApi.Infrastructure;
 
@@ -22,13 +25,6 @@ public static class DependencyInjection
 
         builder.Services.AddProblemDetails();
 
-        builder.Services.AddOpenApiDocument(config =>
-        {
-            config.DocumentName = "v1";
-            config.Title = "Starter API";
-            config.Version = "v1";
-        });
-
         builder.Services.AddHttpContextAccessor();
 
         builder.Services.AddHealthChecks()
@@ -36,6 +32,7 @@ public static class DependencyInjection
 
         // project specific services
         // example : builder.AddProjectAuthentication();
+        builder.AddOpenApi();
         builder.AddOtel();
         builder.AddLogging();
     }
@@ -47,7 +44,10 @@ public static class DependencyInjection
         app.UseAuthorization();
         app.MapControllers();
 
-        app.UseOpenApi();
-        app.UseSwaggerUi();
+        // project specific middleware
+        // example : app.UseProjectCors();
+        app.UseWebOpenApi();
+        app.UseLogging();
+        app.UseOtel();
     }
 }

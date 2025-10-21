@@ -1,8 +1,12 @@
-﻿using OpenTelemetry.Logs;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
+using System.Diagnostics;
+using Azure.Monitor.OpenTelemetry.Exporter;
+using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
-using System.Diagnostics;
 
 namespace Starter.WebApi.Infrastructure.Otel;
 
@@ -22,31 +26,28 @@ public static class DependencyInjection
                         options.RecordException = true;
                         options.Filter = (context) =>
                         {
-                            // Filtrer les health checks par exemple
-                            return !context.Request.Path.StartsWithSegments("/health");
+                            // Filter out path beginning with /healthz or /swagger
+                            return !context.Request.Path.StartsWithSegments("/healthz") ||
+                                   !context.Request.Path.StartsWithSegments("/swagger");
                         };
                     })
                     .AddHttpClientInstrumentation()
                     .AddEntityFrameworkCoreInstrumentation()
-                    .AddConsoleExporter();
-
-                // Ajout de l'exporter OTLP uniquement en production
-                if(builder.Environment.IsProduction())
-                {
-                    tracing.AddOtlpExporter(options =>
+                    .AddConsoleExporter()
+                    // On envoie les traces vers ApplicationInsights (PROD only mais la pour tester)
+                    .AddAzureMonitorTraceExporter(options =>
                     {
-                        options.Endpoint = new Uri(builder.Configuration["GrafanaCloud:Tempo:Endpoint"]!);
-
-                        var tempoCredentials = Convert.ToBase64String(
-                            System.Text.Encoding.UTF8.GetBytes(
-                                $"{builder.Configuration["GrafanaCloud:Tempo:UserId"]}:" +
-                                $"{builder.Configuration["GrafanaCloud:ServiceAccount:Token"]}"
-                            )
-                        );
-                        options.Headers = $"Authorization=Basic {tempoCredentials}";
-                        options.Protocol = OpenTelemetry.Exporter.OtlpExportProtocol.Grpc;
+                        options.ConnectionString = builder.Configuration["ApplicationInsights:ConnectionString"];
                     });
-                }
+            })
+            .WithMetrics(metrics =>
+            {
+                metrics.AddAspNetCoreInstrumentation()
+                .AddHttpClientInstrumentation()
+                .AddAzureMonitorMetricExporter(options =>
+                {
+                    options.ConnectionString = builder.Configuration["ApplicationInsights:ConnectionString"];
+                });
             });
     }
 
@@ -57,11 +58,14 @@ public static class DependencyInjection
 
         app.Use(async (context, next) =>
         {
+            var correlationId = context.Request.Headers["X-Correlation-Id"].FirstOrDefault();
+
             using var activity = Activity.Current;
-            if(activity != null)
+            if (activity != null)
             {
                 activity.SetTag("user.id", context.User?.Identity?.Name ?? "anonymous");
                 activity.SetTag("http.request_id", context.TraceIdentifier);
+                activity.SetTag("correlation_id", correlationId ?? "none");
             }
             await next();
         });

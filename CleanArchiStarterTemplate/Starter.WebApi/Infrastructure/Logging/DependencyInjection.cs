@@ -1,6 +1,8 @@
-﻿using Serilog;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
+using Serilog;
 using Serilog.Enrichers.OpenTelemetry;
-using Serilog.Sinks.Grafana.Loki;
 
 namespace Starter.WebApi.Infrastructure.Logging;
 
@@ -20,28 +22,8 @@ public static class DependencyInjection
                     "| TraceId: {TraceId} | SpanId: {SpanId} " +
                     "{NewLine}{Exception}");
 
-        // Ajout du sink Loki uniquement en production
-        if(builder.Environment.IsProduction())
-        {
-            loggerConfig = loggerConfig.WriteTo.GrafanaLoki(
-                uri: builder.Configuration["GrafanaCloud:Loki:Url"]!,
-                labels: new List<LokiLabel>
-                {
-                new() { Key = "app", Value = "StarterApp" },
-                new() { Key = "environment", Value = builder.Environment.EnvironmentName },
-                new() { Key = "version", Value = "1.0.0" },
-                new() { Key = "instance", Value = Environment.MachineName }
-                },
-                credentials: new LokiCredentials
-                {
-                    Login = builder.Configuration["GrafanaCloud:Loki:UserId"]!,
-                    Password = builder.Configuration["GrafanaCloud:ServiceAccount:Token"]!,
-                },
-                restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Information,
-                batchPostingLimit: 10,
-                period: TimeSpan.FromSeconds(2)
-            );
-        }
+        // Envoi des logs vers ApplicationInsights
+        loggerConfig.WriteTo.ApplicationInsights(builder.Configuration["ApplicationInsights:ConnectionString"], TelemetryConverter.Traces);
 
         Log.Logger = loggerConfig.CreateLogger();
     }
