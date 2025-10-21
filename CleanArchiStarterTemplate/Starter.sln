@@ -33,6 +33,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Starter.Application.Tests",
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Éléments de solution", "Éléments de solution", "{890DC3EF-5675-4F5D-9246-27F22AC6C87D}"
 	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
 		Directory.Build.props = Directory.Build.props
 		Directory.Packages.props = Directory.Packages.props
 	EndProjectSection
@@ -105,5 +106,8 @@ Global
 		{1F097E95-09B3-4727-81B8-2E96A00C7AA2} = {FBE4FAE1-5761-43E5-9DD0-3D44169F2494}
 		{6FF97716-45E7-4CEC-94F0-DBF227C1F7CC} = {5DA1B913-B559-4D15-BC9E-F40AE88701CE}
 		{09349835-56B1-4C16-8BBF-E64B6A6109F1} = {5DA1B913-B559-4D15-BC9E-F40AE88701CE}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4259BC5E-DD64-4163-B2E0-2BCA3A743481}
 	EndGlobalSection
 EndGlobal

@@ -1,10 +1,16 @@
-﻿using Microsoft.AspNetCore.Diagnostics.HealthChecks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
-using Starter.Infrastructure.Database;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Starter.Infrastructure.Database;
+using Starter.WebApi.Infrastructure.Logging;
+using Starter.WebApi.Infrastructure.OpenApi;
+using Starter.WebApi.Infrastructure.Otel;
 
 namespace Starter.WebApi.Infrastructure;
 
@@ -25,13 +31,6 @@ public static class DependencyInjection
 
         builder.Services.AddProblemDetails();
 
-        builder.Services.AddOpenApiDocument(config =>
-        {
-            config.DocumentName = "v1";
-            config.Title = "Starter API";
-            config.Version = "v1";
-        });
-
         builder.Services.AddHttpContextAccessor();
 
         builder.Services.AddHealthChecks()
@@ -39,20 +38,23 @@ public static class DependencyInjection
 
         // project specific services
         // example : builder.AddProjectAuthentication();
+        builder.AddOpenApi();
+        builder.AddOtel();
+        builder.AddLogging();
     }
 
     public static void UseWebInfrastructure(this WebApplication app)
     {
-        // project specific middleware
-        // example : app.UseProjectCors();
-
         // Common MVC configuration
         app.UseHttpsRedirection();
         app.UseAuthorization();
         app.MapControllers();
 
-        app.UseOpenApi();
-        app.UseSwaggerUi();
+        // project specific middleware
+        // example : app.UseProjectCors();
+        app.UseWebOpenApi();
+        app.UseLogging();
+        app.UseOtel();
 
         app.MapHealthChecks("/healthz", new HealthCheckOptions
         {
@@ -67,13 +69,13 @@ public static class DependencyInjection
         var options = new JsonWriterOptions { Indented = true };
 
         using var memoryStream = new MemoryStream();
-        using(var jsonWriter = new Utf8JsonWriter(memoryStream, options))
+        using (var jsonWriter = new Utf8JsonWriter(memoryStream, options))
         {
             jsonWriter.WriteStartObject();
             jsonWriter.WriteString("status", healthReport.Status.ToString());
             jsonWriter.WriteStartObject("results");
 
-            foreach(var healthReportEntry in healthReport.Entries)
+            foreach (var healthReportEntry in healthReport.Entries)
             {
                 jsonWriter.WriteStartObject(healthReportEntry.Key);
                 jsonWriter.WriteString("status",
@@ -82,7 +84,7 @@ public static class DependencyInjection
                     healthReportEntry.Value.Description);
                 jsonWriter.WriteStartObject("data");
 
-                foreach(var item in healthReportEntry.Value.Data)
+                foreach (var item in healthReportEntry.Value.Data)
                 {
                     jsonWriter.WritePropertyName(item.Key);
 

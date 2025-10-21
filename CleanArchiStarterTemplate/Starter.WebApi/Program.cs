@@ -1,3 +1,4 @@
+using Serilog;
 using Starter.Application;
 using Starter.Infrastructure;
 using Starter.WebApi.Infrastructure;
@@ -10,10 +11,14 @@ builder.AddWebInfrastructure();
 builder.Services.AddApplication();
 builder.AddInfrastructure();
 
+builder.Host.UseSerilog();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 await app.UseInfrastructureAsync();
 app.UseWebInfrastructure();
+
+Serilog.Debugging.SelfLog.Enable(msg => Console.WriteLine(msg));
 
 app.Run();
