@@ -1,5 +1,8 @@
-﻿using ErrorOr;
-using MediatR;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
+using ErrorOr;
+using Mediator;
 using Microsoft.Extensions.Logging;
 using Starter.Application.Features.Users.Dto;
 using Starter.Application.Interfaces;
@@ -11,7 +14,7 @@ public record GetUsersResponse(List<UserDto> Users);
 
 public class GetUsersQueryHandler(ITracingService tracingService, ILogger<GetUsersQueryHandler> logger) : IRequestHandler<GetUsersQuery, ErrorOr<GetUsersResponse>>
 {
-    public Task<ErrorOr<GetUsersResponse>> Handle(GetUsersQuery request, CancellationToken cancellationToken)
+    public ValueTask<ErrorOr<GetUsersResponse>> Handle(GetUsersQuery request, CancellationToken cancellationToken)
     {
         using var activity = tracingService.StartActivity("FetchUsers");
 
@@ -27,6 +30,6 @@ public class GetUsersQueryHandler(ITracingService tracingService, ILogger<GetUse
 
         logger.LogInformation("Fetched {UserCount} users", users.Count);
 
-        return Task.FromResult(new GetUsersResponse(users).ToErrorOr());
+        return ValueTask.FromResult(new GetUsersResponse(users).ToErrorOr());
     }
 }

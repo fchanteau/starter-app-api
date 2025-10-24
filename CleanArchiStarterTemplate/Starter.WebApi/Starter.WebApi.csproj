@@ -3,6 +3,10 @@
   <PropertyGroup Condition="'$(Configuration)' == 'DebugWithNSwag'">
     <RunNSwag>true</RunNSwag>
   </PropertyGroup>
+
+  <PropertyGroup>
+    <UserSecretsId>cc5e3de4-aefc-4e27-8179-a8b5ceaf3d51</UserSecretsId>
+  </PropertyGroup>
   
   <ItemGroup>
     <ProjectReference Include="..\Starter.Application\Starter.Application.csproj" />
