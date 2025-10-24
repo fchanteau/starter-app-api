@@ -1,5 +1,8 @@
-﻿using ErrorOr;
-using MediatR;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
+using ErrorOr;
+using Mediator;
 using Microsoft.AspNetCore.Mvc;
 using Starter.Application.Features.Users.Queries;
 using Starter.Contracts.Users;
@@ -13,7 +16,7 @@ public class TestController(IMediator mediator, ILogger<TestController> logger) 
     [HttpGet]
     public async Task<ActionResult> GetUsers()
     {
-        return await mediator.Send(new GetUsersQuery())
+        return await mediator.Send(new GetUsersQuery()).AsTask()
             .Match(response =>
                 Ok(response.Users.Select(u => new UserResponse(u.UserId, u.Username))),
                 Problem);

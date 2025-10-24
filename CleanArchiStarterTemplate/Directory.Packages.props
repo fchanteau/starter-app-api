@@ -3,21 +3,23 @@
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     <!-- Versions centralisées des packages NuGet -->
     <EntityFrameworkCoreVersion>9.0.10</EntityFrameworkCoreVersion>
-    <AspNetCoreVersion>8.0.13</AspNetCoreVersion>
-    <NSwagVersion>14.3.0</NSwagVersion>
-    <OpenTelemetryVersion>1.12.0</OpenTelemetryVersion>
+    <AspNetCoreVersion>8.0.21</AspNetCoreVersion>
+    <NSwagVersion>14.6.1</NSwagVersion>
+    <OpenTelemetryVersion>1.13.1</OpenTelemetryVersion>
+    <MediatorVersion>3.0.1</MediatorVersion>
   </PropertyGroup>
   <ItemGroup>
     <!-- Third tiers library -->
     <PackageVersion Include="ErrorOr" Version="2.0.1" />
-    <PackageVersion Include="MediatR" Version="12.4.1" />
+    <PackageVersion Include="Mediator.SourceGenerator" Version="$(MediatorVersion)"/>
+    <PackageVersion Include="Mediator.Abstractions" Version="$(MediatorVersion)"/>
     <PackageVersion Include="BCrypt.Net-Next" Version="4.0.3" />
     <PackageVersion Include="NSwag.AspNetCore" Version="$(NSwagVersion)" />
     <PackageVersion Include="NSwag.MSBuild" Version="$(NSwagVersion)" />
     <!-- ASP.NET Core -->
     <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="$(AspNetCoreVersion)" />
     <PackageVersion Include="Microsoft.AspNetCore.Authorization" Version="$(AspNetCoreVersion)" />
-    <PackageVersion Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version ="8.0.20"/>
+    <PackageVersion Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version ="$(AspNetCoreVersion)"/>
     <!-- Azure -->
     <PackageVersion Include="Azure.Extensions.AspNetCore.Configuration.Secrets" Version="1.4.0" />
     <PackageVersion Include="Azure.Identity" Version="1.14.0" />
@@ -27,7 +29,7 @@
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="$(EntityFrameworkCoreVersion)" />
     <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
     <!-- Tests -->
-    <PackageVersion Include="FluentAssertions" Version="8.7.1" />
+    <PackageVersion Include="FluentAssertions" Version="8.8.0" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.0.0" />
     <PackageVersion Include="xunit" Version="2.9.3" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.5" />
@@ -36,8 +38,8 @@
     
     <!-- Open Telemetry -->
     <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="$(OpenTelemetryVersion)" />
-    <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore" Version="$(OpenTelemetryVersion)" />
-    <PackageVersion Include="OpenTelemetry.Instrumentation.Http" Version="$(OpenTelemetryVersion)" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.13.0" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.Http" Version="1.13.0" />
     <PackageVersion Include="OpenTelemetry.Exporter.Console" Version="$(OpenTelemetryVersion)" />
     <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="$(OpenTelemetryVersion)" />
     <PackageVersion Include="OpenTelemetry.Instrumentation.EntityFrameworkCore" Version="1.12.0-beta.1" />
